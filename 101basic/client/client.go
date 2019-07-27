@@ -1,3 +1,4 @@
+// 示例客户端如何同步调用服务端服务
 package main
 
 import (
@@ -17,6 +18,7 @@ var (
 func main() {
 	flag.Parse()
 
+	// 采取点对点发现服务, (实际上没有注册中心, 客户端直接通过tcp连接服务端进行服务调用)
 	d := client.NewPeer2PeerDiscovery("tcp@"+*addr, "")
 	xclient := client.NewXClient("Arith", client.Failtry, client.RandomSelect, d, client.DefaultOption)
 	defer xclient.Close()
@@ -27,7 +29,9 @@ func main() {
 	}
 
 	for {
+
 		reply := &example.Reply{}
+		// 同步调用服务端
 		err := xclient.Call(context.Background(), "Mul", args, reply)
 		if err != nil {
 			log.Fatalf("failed to call: %v", err)
